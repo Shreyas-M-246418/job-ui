@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import Cookies from 'universal-cookie';
 import axios from 'axios';
@@ -45,15 +44,28 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('lastAuthCheck');
   };
 
-  const login = (userData, token) => {
+  const login = async (userData, token) => {
     setUser(userData);
     cookies.set('auth_token', token, { 
       path: '/',
-      maxAge: 86400, // 24 hours
+      maxAge: 86400,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     });
     localStorage.setItem('lastAuthCheck', Date.now().toString());
+    
+    // Verify token immediately after setting
+    try {
+      await axios.get(`${API_BASE_URL}/auth/verify`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    } catch (error) {
+      console.error('Token verification failed:', error);
+      handleLogout();
+      throw error;
+    }
   };
 
   // Function to get the current auth token

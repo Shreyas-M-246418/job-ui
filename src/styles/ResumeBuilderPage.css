@@ -1,0 +1,303 @@
+.resume-builder-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: #f5f5f5;
+  }
+  
+  .resume-builder-card {
+    width: 100%;
+    max-width: 800px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .resume-builder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background-color: #4285f4;
+    color: white;
+  }
+  
+  .resume-builder-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  .closee-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+  }
+  
+  .close-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .resume-builder-content {
+    padding: 2rem;
+  }
+  
+  .progress-bar {
+    height: 6px;
+    background-color: #e0e0e0;
+    border-radius: 3px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background-color: #4285f4;
+    transition: width 0.3s ease;
+  }
+  
+  .steps-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+  
+  .step {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .step.active {
+    background-color: #4285f4;
+    color: white;
+  }
+  
+  .resume-step {
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .resume-step h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: #333;
+    font-size: 1.3rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.2rem;
+  }
+  
+  .form-input, .form-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  
+  .form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #4285f4;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+  }
+  
+  .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .form-group.split {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .form-group.split .form-input {
+    flex: 1;
+  }
+  
+  .form-section {
+    background-color: #f9f9f9;
+    padding: 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 1.2rem;
+    position: relative;
+  }
+  
+  .add-button, .remove-button {
+    background-color: transparent;
+    border: 1px solid #4285f4;
+    color: #4285f4;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    margin-bottom: 1.2rem;
+  }
+  
+  .add-button:hover {
+    background-color: #4285f4;
+    color: white;
+  }
+  
+  .remove-button {
+    border-color: #f44336;
+    color: #f44336;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+  
+  .remove-button:hover {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .step-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+  }
+  
+  .prev-button, .next-button, .generate-button, .download-button, .edit-button, .done-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .prev-button {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #666;
+  }
+  
+  .prev-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .next-button, .generate-button {
+    background-color: #4285f4;
+    border: none;
+    color: white;
+  }
+  
+  .next-button:hover, .generate-button:hover {
+    background-color: #3367d6;
+  }
+  
+  .download-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .download-button {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #333;
+    flex: 1;
+  }
+  
+  .download-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .edit-button {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #333;
+  }
+  
+  .edit-button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .done-button {
+    background-color: #4285f4;
+    border: none;
+    color: white;
+  }
+  
+  .done-button:hover {
+    background-color: #3367d6;
+  }
+  
+  .generating {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 0;
+  }
+  
+  .generating p {
+    margin-top: 1rem;
+    color: #666;
+  }
+  
+  
+  @keyframes l24 {
+    100% { transform: rotate(1turn); }
+  }
+  
+  .resume-preview {
+    background-color: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    max-height: 500px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+    line-height: 1.5;
+  }
+  
+  @media (max-width: 768px) {
+    .resume-builder-page {
+      padding: 1rem;
+    }
+    
+    .resume-builder-card {
+      border-radius: 8px;
+    }
+    
+    .resume-builder-content {
+      padding: 1.5rem;
+    }
+    
+    .form-group.split {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .download-buttons {
+      flex-direction: column;
+    }
+  } 

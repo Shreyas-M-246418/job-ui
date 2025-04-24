@@ -54,7 +54,7 @@
 
 .main-content {
   display: flex;
-  padding-top: 120px;
+  padding-top: 110px;
   max-width: 1400px;
   margin: 0 auto;
   gap: 2rem;
@@ -351,4 +351,69 @@
   align-items: center;
   background-color: rgba(255, 255, 255, 0.8);
   z-index: 1000;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 200px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  z-index: 1;
+  border-radius: 8px;
+  padding: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.custom-domain-input {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-top: 1px solid #eee;
+}
+
+.custom-domain-input input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: border-color 0.3s;
+}
+
+.custom-domain-input input:focus {
+  outline: none;
+  border-color: #4285f4;
+  box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.1);
+}
+
+.skills-required {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #555;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.skills-label {
+  font-weight: 600;
+  color: #333;
+}
+
+.resume-builder-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 0.5rem;
+}
+
+.resume-builder-button:hover {
+  background-color: #3367d6;
 }

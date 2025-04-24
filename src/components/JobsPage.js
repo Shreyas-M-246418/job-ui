@@ -5,16 +5,19 @@ import { useAuth } from '../contexts/AuthContext';
 import { API_BASE_URL } from '../utils/config';
 import { Plus } from 'lucide-react';
 import '../styles/JobsPage.css';
+import { validateAlphaInput } from '../utils/inputValidation';
+import ValidatedSearchInput from './ValidatedSearchInput';
 
 const JobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
-    title: '',
+    search: '',
     location: '',
     userType: [],
     domain: [],
+    customDomain: '',
     employmentType: [],
     workType: []
   });
@@ -32,7 +35,7 @@ const JobsPage = () => {
     'Machine Learning'
   ];
 
-  const fetchJobs = async () => {
+  const fetchJobs = async (retryCount = 0) => {
     if (!user || !user.userId) {
       setLoading(false);
       setJobs([]);
@@ -54,18 +57,22 @@ const JobsPage = () => {
         }
       );
       
-      setJobs(response.data);
+      // Sort jobs by createdAt date in descending order (newest first)
+      const sortedJobs = response.data.sort((a, b) => 
+        new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setJobs(sortedJobs);
       setError(null);
     } catch (error) {
       console.error('Error fetching jobs:', error);
-      if (error.response?.status === 401) {
+      if (error.response?.status === 401 && retryCount < 3) {
         await checkAuth();
-        if (getToken()) {
-          fetchJobs();
-        } else {
-          setError('Your session has expired. Please log in again.');
-          navigate('/login-signup');
+        const newToken = getToken();
+        if (newToken) {
+          return fetchJobs(retryCount + 1);
         }
+        setError('Your session has expired. Please log in again.');
+        navigate('/login-signup');
       } else {
         setError('Failed to load jobs. Please try again.');
       }
@@ -81,10 +88,14 @@ const JobsPage = () => {
   }, [user]);
 
   const handleFilterChange = (e, field) => {
-    setFilters({
-      ...filters,
-      [field]: e.target.value
-    });
+    const value = field === 'search' || field === 'location' || field === 'customDomain'
+      ? validateAlphaInput(e.target.value)
+      : e.target.value;
+    
+    setFilters(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleUserTypeChange = (e) => {
@@ -113,10 +124,11 @@ const JobsPage = () => {
 
   const clearFilters = () => {
     setFilters({
-      title: '',
+      search: '',
       location: '',
       userType: [],
       domain: [],
+      customDomain: '',
       employmentType: [],
       workType: []
     });
@@ -162,9 +174,11 @@ const JobsPage = () => {
   };
 
   const filteredJobs = jobs.filter(job => {
-    // Filter by title/company name
-    const titleMatch = job.title.toLowerCase().includes(filters.title.toLowerCase()) ||
-      job.companyName?.toLowerCase().includes(filters.title.toLowerCase());
+    // Filter by title/company name/skills
+    const searchMatch = !filters.search || 
+      job.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+      job.companyName?.toLowerCase().includes(filters.search.toLowerCase()) ||
+      (job.skillsRequired && job.skillsRequired.toLowerCase().includes(filters.search.toLowerCase()));
 
     // Filter by location
     const locationMatch = job.location.toLowerCase().includes(filters.location.toLowerCase());
@@ -175,7 +189,8 @@ const JobsPage = () => {
 
     // Filter by domain
     const domainMatch = filters.domain.length === 0 ||
-      filters.domain.includes(job.domain);
+      filters.domain.includes(job.domain) ||
+      (filters.customDomain && job.domain.toLowerCase().includes(filters.customDomain.toLowerCase()));
 
     // Filter by employment type
     const employmentTypeMatch = filters.employmentType.length === 0 ||
@@ -186,7 +201,7 @@ const JobsPage = () => {
       filters.workType.includes(job.workType?.toLowerCase());
 
     // Return true only if all conditions match
-    return titleMatch && 
+    return searchMatch && 
            locationMatch && 
            userTypeMatch && 
            domainMatch && 
@@ -205,21 +220,22 @@ const JobsPage = () => {
   return (
     <div className="dashboard-container">
       <div className="search-filters">
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Title/skill or Company"
-            value={filters.title}
-            onChange={(e) => handleFilterChange(e, 'title')}
-            className="search-input"
-          />
-          <input
-            type="text"
-            placeholder="Location"
-            value={filters.location}
-            onChange={(e) => handleFilterChange(e, 'location')}
-            className="search-input"
-          />
+          <div className="search-bar">
+            <ValidatedSearchInput
+              placeholder="Title, Company, or Skills"
+              value={filters.search}
+              onChange={(e) => handleFilterChange(e, 'search')}
+              pattern="[A-Za-z\s,]+"
+              title="Only letters, spaces and commas are allowed"
+              allowSlash={false}
+            />
+            <ValidatedSearchInput
+              placeholder="Location"
+              value={filters.location}
+              onChange={(e) => handleFilterChange(e, 'location')}
+              pattern="[A-Za-z\s]+"
+              title="Only letters, spaces and slashes are allowed"
+            />
           <div className="filter-dropdown">
             <button className={`filter-button ${filters.userType.length > 0 ? 'has-selection' : ''}`}>
               User Type {filters.userType.length > 0 && `(${filters.userType.length})`}
@@ -261,7 +277,7 @@ const JobsPage = () => {
             </div>
           </div>
           <div className="filter-dropdown">
-            <button className={`filter-button ${filters.domain.length > 0 ? 'has-selection' : ''}`}>
+            <button className={`filter-button ${filters.domain.length > 0 || filters.customDomain ? 'has-selection' : ''}`}>
               Domain {filters.domain.length > 0 && `(${filters.domain.length})`}
             </button>
             <div className="dropdown-content">
@@ -276,7 +292,18 @@ const JobsPage = () => {
                   {domain}
                 </label>
               ))}
-              <button className="clear-filter" onClick={() => handleClearFilter('domain')}>
+              <div className="custom-domain-input">
+                <input
+                  type="text"
+                  placeholder="Custom domain"
+                  value={filters.customDomain}
+                  onChange={(e) => handleFilterChange(e, 'customDomain')}
+                />
+              </div>
+              <button className="clear-filter" onClick={() => {
+                handleClearFilter('domain');
+                setFilters(prev => ({...prev, customDomain: ''}));
+              }}>
                 Clear
               </button>
             </div>
@@ -347,6 +374,11 @@ const JobsPage = () => {
                   <span>📍 {job.location}</span>
                   <span>{job.salary}</span>
                 </div>
+                {job.skillsRequired && (
+                  <div className="skills-required">
+                    <span className="skills-label">Skills:</span> {job.skillsRequired}
+                  </div>
+                )}
               </div>
             ))}
           </div>

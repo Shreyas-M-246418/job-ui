@@ -6,8 +6,8 @@ import LoginSignupPage from './components/LoginSignupPage';
 import Logout from './components/Logout';
 import GitHubCallback from './components/GitHubCallback';
 import HirePage from './components/HirePage';
+import ResumeBuilderPage from './components/ResumeBuilderPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import JobsDashboard from './components/JobsDashboard';
 import './App.css';
 import axios from 'axios';
 import { API_BASE_URL } from './utils/config';
@@ -70,14 +70,6 @@ const App = () => {
             <Route path="/" element={<Navigate to="/display-jobs" />} />
             <Route path="/display-jobs" element={<DisplayJobsPage />} />
             <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <JobsDashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route
               path="/jobs"
               element={
                 <PrivateRoute>
@@ -94,6 +86,10 @@ const App = () => {
                   <HirePage />
                 </PrivateRoute>
               }
+            />
+            <Route
+              path="/resume-builder"
+              element={<ResumeBuilderPage />}
             />
           </Routes>
         </div>

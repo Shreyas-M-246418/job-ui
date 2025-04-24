@@ -18,14 +18,17 @@ const GitHubCallback = () => {
         if (code) {
           const response = await axios.post(`${API_BASE_URL}/auth/github/callback`, { code });
           const { token, user } = response.data;
-    
-          login(user, token);
-    
-          navigate('/jobs');
+          
+          if (!token || !user) {
+            throw new Error('Invalid response from server');
+          }
+          
+          await login(user, token);
+          navigate('/jobs', { replace: true });
         }
       } catch (error) {
         console.error('Error during GitHub callback:', error);
-        navigate('/display-jobs');
+        navigate('/display-jobs', { replace: true });
       }
     };
 
@@ -34,6 +37,7 @@ const GitHubCallback = () => {
 
   return (
     <div className="loading">
+      <div className="loader"></div>
       <h2>Authenticating...</h2>
     </div>
   );

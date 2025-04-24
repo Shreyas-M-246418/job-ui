@@ -2,10 +2,10 @@
   "name": "job-ui",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
+ "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
     "@google/generative-ai": "^0.21.0",
-    "@mlc-ai/web-llm": "^0.2.77",
+    "@huggingface/transformers": "^3.3.3",
     "@react-oauth/google": "^0.12.1",
     "@tailwindcss/forms": "^0.5.9",
     "@tailwindcss/line-clamp": "^0.4.4",
