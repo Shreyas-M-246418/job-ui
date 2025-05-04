@@ -255,16 +255,51 @@
     align-items: center;
     justify-content: center;
     padding: 3rem 0;
+    min-height: 300px;
   }
   
   .generating p {
     margin-top: 1rem;
     color: #666;
+    font-size: 1.1rem;
   }
   
+  .loader {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 6px solid transparent;
+    border-right-color: #ffa500;
+    position: relative;
+    animation: l24 1s infinite linear;
+  }
+  
+  .loader:before,
+  .loader:after {
+    content: "";
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 6px solid transparent;
+    border-right-color: #ffa500;
+    animation: l24 1s infinite linear;
+  }
+  
+  .loader:before {
+    animation-duration: 2s;
+  }
+  
+  .loader:after {
+    animation-duration: 4s;
+  }
   
   @keyframes l24 {
     100% { transform: rotate(1turn); }
+  }
+  
+  .generate-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
   }
   
   .resume-preview {

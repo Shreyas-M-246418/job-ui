@@ -79,6 +79,7 @@ const ResumeBuilderPage = () => {
   const generateResume = async () => {
     try {
       setIsGenerating(true);
+      setCurrentStep(5); // Move to step 5 to show loading animation
       
       console.log('Sending resume data to server:', formData);
       
@@ -97,7 +98,6 @@ const ResumeBuilderPage = () => {
 
       if (response.data && response.data.resume) {
         setResumeContent(response.data.resume);
-        setCurrentStep(5);
       } else {
         throw new Error('No resume content received from server');
       }
@@ -118,6 +118,7 @@ const ResumeBuilderPage = () => {
       }
       
       alert(errorMessage);
+      setCurrentStep(4); // Go back to step 4 if there's an error
     } finally {
       setIsGenerating(false);
     }
@@ -395,8 +396,12 @@ const ResumeBuilderPage = () => {
             </div>
             <div className="step-buttons">
               <button onClick={prevStep} className="prev-button">Previous</button>
-              <button onClick={generateResume} className="generate-button">
-                Generate Resume
+              <button 
+                onClick={generateResume} 
+                className="generate-button"
+                disabled={isGenerating}
+              >
+                {isGenerating ? 'Generating...' : 'Generate Resume'}
               </button>
             </div>
           </div>
