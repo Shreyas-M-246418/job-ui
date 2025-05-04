@@ -2,7 +2,7 @@
   "name": "job-ui",
   "version": "0.1.0",
   "private": true,
- "dependencies": {
+  "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
     "@google/generative-ai": "^0.21.0",
     "@huggingface/transformers": "^3.3.3",

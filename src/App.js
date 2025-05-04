@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'r
 import DisplayJobsPage from './components/DisplayJobsPage';
 import JobsPage from './components/JobsPage';
 import LoginSignupPage from './components/LoginSignupPage';
+import LoginPage from './components/LoginPage';
 import Logout from './components/Logout';
 import GitHubCallback from './components/GitHubCallback';
 import HirePage from './components/HirePage';
@@ -87,10 +88,8 @@ const App = () => {
                 </PrivateRoute>
               }
             />
-            <Route
-              path="/resume-builder"
-              element={<ResumeBuilderPage />}
-            />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/resume-builder" element={<ResumeBuilderPage />} />
           </Routes>
         </div>
       </AuthProvider>

@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/ResumeBuilderPage.css';
-import TransformerService from '../services/transformerService';
-import ModelInitializer from './ModelInitializer';
-import { TextStreamer } from "@huggingface/transformers";
+import axios from 'axios';
+import { API_BASE_URL } from '../utils/config';
 
 const ResumeBuilderPage = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isModelInitialized, setIsModelInitialized] = useState(false);
   const [resumeContent, setResumeContent] = useState('');
   const [formData, setFormData] = useState({
     fullName: '',
@@ -30,12 +28,10 @@ const ResumeBuilderPage = () => {
     const { name, value } = e.target;
     
     if (index !== null && field) {
-      // Handle nested array fields (education, experience, projects)
       const updatedArray = [...formData[field]];
       updatedArray[index] = { ...updatedArray[index], [name]: value };
       setFormData({ ...formData, [field]: updatedArray });
     } else {
-      // Handle simple fields
       setFormData({ ...formData, [name]: value });
     }
   };
@@ -84,132 +80,59 @@ const ResumeBuilderPage = () => {
     try {
       setIsGenerating(true);
       
-      // Format the data for the prompt
-      const educationText = formData.education.map(edu => 
-        `${edu.school} - ${edu.degree} in ${edu.field} (${edu.graduationYear})`
-      ).join('\n');
+      console.log('Sending resume data to server:', formData);
       
-      const experienceText = formData.experience.map(exp => 
-        `${exp.position} at ${exp.company} (${exp.startDate} - ${exp.endDate})\n${exp.description}`
-      ).join('\n\n');
-      
-      const projectsText = formData.projects;
-      
-      const prompt = `Create a professional resume for the following person:
-      
-Name: ${formData.fullName}
-Email: ${formData.email}
-Phone: ${formData.phone}
-Location: ${formData.location}
-Summary: ${formData.summary}
-
-Education:
-${educationText}
-
-Experience:
-${experienceText}
-
-Projects:
-${projectsText}
-
-Skills: ${formData.skills}
-Certifications: ${formData.certifications}
-Languages: ${formData.languages}
-Interests: ${formData.interests}
-
-Please format this as a professional resume with appropriate sections and formatting.`;
-
-      const { tokenizer, model } = await TransformerService.initialize();
-      
-      // Convert input to tensor with correct data type
-      const inputs = await tokenizer(prompt, { 
-        return_tensors: "pt",
-        padding: true,
-        truncation: true,
-        max_length: 2048
-      });
-
-      let generatedText = '';
-      
-      try {
-        // First attempt: Try with streaming
-        const streamer = new TextStreamer(tokenizer, {
-          skip_prompt: true,
-          skip_special_tokens: true,
-          callback_function: (token) => {
-            generatedText += token;
-          }
-        });
-
-        const generationConfig = {
-          ...inputs,
-          max_new_tokens: 2000,
-          do_sample: false,
-          streamer,
-          stopping_criteria: TransformerService.stopping_criteria,
-          pad_token_id: tokenizer.pad_token_id,
-          eos_token_id: tokenizer.eos_token_id,
-        };
-
-        await model.generate(generationConfig);
-      } catch (modelError) {
-        console.error('Streaming generation failed, trying non-streaming approach:', modelError);
-        
-        // Second attempt: Try without streaming
-        const generationConfig = {
-          ...inputs,
-          max_new_tokens: 2000,
-          do_sample: false,
-          pad_token_id: tokenizer.pad_token_id,
-          eos_token_id: tokenizer.eos_token_id,
-        };
-
-        const output = await model.generate(generationConfig);
-
-        // Handle different possible output formats
-        if (output && typeof output === 'object') {
-          if (Array.isArray(output)) {
-            generatedText = tokenizer.decode(output[0], { skip_special_tokens: true });
-          } else if (output.sequences) {
-            generatedText = tokenizer.decode(output.sequences[0], { skip_special_tokens: true });
-          } else if (output.output_ids) {
-            generatedText = tokenizer.decode(output.output_ids[0], { skip_special_tokens: true });
-          } else {
-            // If we can't find the expected output format, try to decode the entire output
-            generatedText = tokenizer.decode(output, { skip_special_tokens: true });
-          }
-        } else {
-          throw new Error('Unexpected model output format');
+      const response = await axios.post(
+        `${API_BASE_URL}/api/generate-resume`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          timeout: 60000
         }
-      }
+      );
 
-      if (!generatedText) {
-        throw new Error('Failed to generate resume content');
-      }
+      console.log('Server response:', response.data);
 
-      setResumeContent(generatedText);
-      setCurrentStep(5); // Move to the final step
+      if (response.data && response.data.resume) {
+        setResumeContent(response.data.resume);
+        setCurrentStep(5);
+      } else {
+        throw new Error('No resume content received from server');
+      }
     } catch (error) {
       console.error('Error generating resume:', error);
-      alert('Failed to generate resume. Please try again.');
+      
+      let errorMessage = 'Failed to generate resume. Please try again.';
+      
+      if (error.response) {
+        console.error('Server error response:', error.response.data);
+        errorMessage = `Server error: ${error.response.data.error || error.response.statusText || 'Unknown error'}`;
+      } else if (error.request) {
+        console.error('No response received:', error.request);
+        errorMessage = 'No response from server. Please check your connection and try again.';
+      } else {
+        console.error('Request setup error:', error.message);
+        errorMessage = `Error: ${error.message}`;
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsGenerating(false);
     }
   };
 
   const downloadResume = (format) => {
-    // Create a Blob with the resume content
     const blob = new Blob([resumeContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     
-    // Create a link element and trigger download
     const link = document.createElement('a');
     link.href = url;
     link.download = `${formData.fullName.replace(/\s+/g, '_')}_Resume.${format}`;
     document.body.appendChild(link);
     link.click();
     
-    // Clean up
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
@@ -524,33 +447,30 @@ Please format this as a professional resume with appropriate sections and format
 
   return (
     <div className="resume-builder-page">
-      <ModelInitializer onInitialized={() => setIsModelInitialized(true)} />
-      {isModelInitialized && (
-        <div className="resume-builder-card">
-          <div className="resume-builder-header">
-            <h2>Resume Builder</h2>
-            <button className="closee-button" onClick={() => navigate('/display-jobs')}>
-              ×
-            </button>
-          </div>
-          <div className="resume-builder-content">
-            <div className="progress-bar">
-              <div 
-                className="progress-fill" 
-                style={{ width: `${(currentStep / 5) * 100}%` }}
-              ></div>
-            </div>
-            <div className="steps-indicator">
-              <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>1</div>
-              <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>2</div>
-              <div className={`step ${currentStep >= 3 ? 'active' : ''}`}>3</div>
-              <div className={`step ${currentStep >= 4 ? 'active' : ''}`}>4</div>
-              <div className={`step ${currentStep >= 5 ? 'active' : ''}`}>5</div>
-            </div>
-            {renderStep()}
-          </div>
+      <div className="resume-builder-card">
+        <div className="resume-builder-header">
+          <h2>Resume Builder</h2>
+          <button className="closee-button" onClick={() => navigate('/display-jobs')}>
+            ×
+          </button>
         </div>
-      )}
+        <div className="resume-builder-content">
+          <div className="progress-bar">
+            <div 
+              className="progress-fill" 
+              style={{ width: `${(currentStep / 5) * 100}%` }}
+            ></div>
+          </div>
+          <div className="steps-indicator">
+            <div className={`step ${currentStep >= 1 ? 'active' : ''}`}>1</div>
+            <div className={`step ${currentStep >= 2 ? 'active' : ''}`}>2</div>
+            <div className={`step ${currentStep >= 3 ? 'active' : ''}`}>3</div>
+            <div className={`step ${currentStep >= 4 ? 'active' : ''}`}>4</div>
+            <div className={`step ${currentStep >= 5 ? 'active' : ''}`}>5</div>
+          </div>
+          {renderStep()}
+        </div>
+      </div>
     </div>
   );
 };

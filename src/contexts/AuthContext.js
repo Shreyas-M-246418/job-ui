@@ -16,25 +16,31 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     const token = cookies.get('auth_token');
-    if (token) {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/auth/verify`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        
-        if (response.data.user) {
-          setUser(response.data.user);
-        } else {
-          handleLogout();
-        }
-      } catch (error) {
-        console.error('Auth verification failed:', error);
-        handleLogout();
-      }
+    if (!token) {
+      setLoading(false);
+      return false;
     }
-    setLoading(false);
+    
+    try {
+      const response = await axios.get(`${API_BASE_URL}/auth/verify`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      if (response.data.user) {
+        setUser(response.data.user);
+        setLoading(false);
+        return true;
+      } else {
+        handleLogout();
+        return false;
+      }
+    } catch (error) {
+      console.error('Auth verification failed:', error);
+      handleLogout();
+      return false;
+    }
   };
 
   const handleLogout = () => {
@@ -61,6 +67,7 @@ export const AuthProvider = ({ children }) => {
           Authorization: `Bearer ${token}`
         }
       });
+      return true;
     } catch (error) {
       console.error('Token verification failed:', error);
       handleLogout();

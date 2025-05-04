@@ -5,6 +5,7 @@ import JobDetails from './JobDetails';
 import { validateAlphaInput } from '../utils/inputValidation';
 import ValidatedSearchInput from './ValidatedSearchInput';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const DisplayJobsPage = () => {
   const [jobs, setJobs] = useState([]);
@@ -32,6 +33,7 @@ const DisplayJobsPage = () => {
     'Machine Learning'
   ];
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchJobs = async () => {
