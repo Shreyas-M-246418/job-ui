@@ -15,7 +15,7 @@ import { API_BASE_URL } from './utils/config';
 
 const AuthenticatedNav = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   const handleDirectLogin = async () => {
     try {
