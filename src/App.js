@@ -30,7 +30,7 @@ const AuthenticatedNav = () => {
     <nav className="top-navbar">
       <div className="nav-left">
         <a href="/display-jobs" className="nav-brand">
-          <img src="/jobhub-logo.jpg" alt="JobHub" className="nav-logo" />
+          <img src="/download.png" alt="JobHub" className="nav-logo" />
         </a>
       </div>
       <div className="nav-right">
