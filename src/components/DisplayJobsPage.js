@@ -38,7 +38,7 @@ const DisplayJobsPage = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get('https://job-ui-server.onrender.com/api/public/jobs');
+        const response = await axios.get(`${API_BASE_URL}/api/public/jobs`);
         // Sort jobs by createdAt date in descending order (newest first)
         const sortedJobs = response.data.sort((a, b) => 
           new Date(b.createdAt) - new Date(a.createdAt)
