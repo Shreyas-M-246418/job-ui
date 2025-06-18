@@ -25,7 +25,20 @@
     "react-scripts": "5.0.1",
     "shadcn-ui": "^0.9.3",
     "universal-cookie": "^7.2.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "@octokit/rest": "^21.0.2",
+    "connect-mongo": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "express-rate-limit": "^6.11.2",
+    "express-session": "^1.18.1",
+    "jsonwebtoken": "^9.0.2",
+    "node-fetch": "^3.3.2",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
+    "session-file-store": "^1.5.0"
   },
   "scripts": {
     "start": "react-app-rewired start",
